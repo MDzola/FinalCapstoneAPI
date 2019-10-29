@@ -3,34 +3,36 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
-from ItemFinder.models import ItemCategory
+from ItemFinder.models import Equipment
 
-class ItemCategorySerializer(serializers.HyperlinkedModelSerializer):
+class EquipmentSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for park areas
     Arguments:
         serializers
     """
     class Meta:
-        model = ItemCategory
+        model = Equipment
         url = serializers.HyperlinkedIdentityField(
-            view_name='itemcategory',
+            view_name='equipment',
             lookup_field='id'
         )
-        fields = ('id', 'url', 'name')
+        fields = ('id', 'url', 'name', 'manufacturer', 'manufacturer_contact')
 
 
-class ItemCategories(ViewSet):
+class Equipment(ViewSet):
 
     def create(self, request):
         """Handle POST operations
         Returns:
             Response -- JSON serialized product category instance
         """
-        new_item_category = ItemCategory()
-        new_item_category.name = request.data["name"]
-        new_item_category.save()
+        new_equipment = Equipment()
+        new_equipment.name = request.data["name"]
+        new_equipment.manufacturer = request.data["manufacturer"]
+        new_equipment.manufacturer_contact = request.data["manufacturer_contact"]
+        new_equipment.save()
 
-        serializer = ItemCategorySerializer(new_item_category, context={'request': request})
+        serializer = EquipmentSerializer(new_equipment, context={'request': request})
 
         return Response(serializer.data)
 
@@ -40,8 +42,8 @@ class ItemCategories(ViewSet):
             Response -- JSON serialized park area instance
         """
         try:
-            category = ItemCategory.objects.get(pk=pk)
-            serializer = ItemCategorySerializer(category, context={'request': request})
+            equipment = Equipment.objects.get(pk=pk)
+            serializer = EquipmentSerializer(equipment, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
             return HttpResponseServerError(ex)
@@ -51,8 +53,8 @@ class ItemCategories(ViewSet):
         Returns:
             Response -- JSON serialized list of park ProductCategorys
         """
-        item_categories = ItemCategory.objects.all()
+        all_equipment = Equipment.objects.all()
 
-        serializer = ItemCategorySerializer(
-            item_categories, many=True, context={'request': request})
+        serializer = EquipmentSerializer(
+            all_equipment, many=True, context={'request': request})
         return Response(serializer.data)
