@@ -1,5 +1,5 @@
 from django.db import models
-from .requisition import RequisitionOrder
+from .requisitionorder import RequisitionOrder
 from .spareitem import SpareItem
 
 
