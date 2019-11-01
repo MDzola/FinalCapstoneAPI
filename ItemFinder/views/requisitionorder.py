@@ -116,8 +116,22 @@ class RequisitionOrders(ViewSet):
             if "is_complete" in request.data:
                 try:
                     open_requisition_order = RequisitionOrder.objects.get(employee=employee, isComplete=False)
+                    items_on_requisition = open_requisition_order.cart.all()
+                    items_on_requisition_set = set()
                     open_requisition_order.isComplete = True
                     open_requisition_order.save()
+
+                    if open_requisition_order.isComplete:
+                        for ir in items_on_requisition:
+                            items_on_requisition_set.add(ir.spareItem)
+
+                        spareItems = list(items_on_requisition_set)
+
+                        for i in spareItems:
+                            num_sold = i.cart.filter(requisitionOrder=open_requisition_order).count()
+                            i.quantity = i.new_inventory(num_sold)
+                            i.save()
+
                     return Response({}, status=status.HTTP_204_NO_CONTENT)
 
                 except RequisitionOrder.DoesNotExist as ex:
