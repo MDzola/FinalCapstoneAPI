@@ -63,19 +63,10 @@ class SpareItems(ViewSet):
             return HttpResponseServerError(ex)
 
     def update(self, request, pk=None):
-        """Handle PUT requests for a park area attraction
 
-        Returns:
-            Response -- Empty body with 204 status code
-        """
         spare_item_update = SpareItem.objects.get(pk=pk)
-        spare_item_update.name = request.data["name"]
-        spare_item_update.description = request.data["description"]
         spare_item_update.quantity = request.data["quantity"]
-        spare_item_update.critical_quantity = request.data["critical_quantity"]
-        category = ItemCategory.objects.get(pk=request.data["itemcategory_id"])
 
-        spare_item_update.category = category
         spare_item_update.save()
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
