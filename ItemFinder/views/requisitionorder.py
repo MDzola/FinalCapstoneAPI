@@ -83,24 +83,36 @@ class RequisitionOrders(ViewSet):
         except Exception as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @action(methods=['get'], detail=False)
+    @action(methods=['get', 'put'], detail=False)
     def cart(self, request):
 
         employee = Employee.objects.get(user=request.auth.user)
 
         if request.method == "GET":
 
-
-
             try:
                 open_requisition_order = RequisitionOrder.objects.get(employee=employee, isComplete=False)
-                items_on_requisition = SpareItem.objects.filter(cart__order=open_requisition_order)
+                items_on_requisition = SpareItem.objects.filter(cart__requisitionOrder=open_requisition_order)
             except RequisitionOrder.DoesNotExist as ex:
                 return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 
             serializer = SpareItemSerializer(items_on_requisition, many=True, context={'request': request})
             return Response(serializer.data)
 
+        if request.method == "PUT":
+
+            if "spareItem_id" in request.data:
+
+                try:
+                    open_requisition_order = RequisitionOrder.objects.get(employee=employee, isComplete=False)
+                    spare_item = SpareItem.objects.get(pk=request.data["spareItem_id"])
+                    delete_me = RequisitionItem.objects.filter(spareItem=spare_item, requisitionOrder=open_requisition_order)[0]
+                    delete_me.delete()
+
+                except RequisitionOrder.DoesNotExist as ex:
+                    return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+
+                return Response({}, status=status.HTTP_204_NO_CONTENT)
 
     def list(self, request):
 
