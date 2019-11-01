@@ -1,5 +1,5 @@
 from django.db import models
-from .requisition import Requisition
+from .requisitionorder import RequisitionOrder
 from .spareitem import SpareItem
 
 
@@ -10,5 +10,5 @@ class RequisitionItem(models.Model):
     methods: none
     """
 
-    requisitionOrder = models.ForeignKey(Requisition, on_delete=models.CASCADE, related_name='cart')
+    requisitionOrder = models.ForeignKey(RequisitionOrder, on_delete=models.CASCADE, related_name='cart')
     spareItem = models.ForeignKey(SpareItem, on_delete=models.CASCADE, related_name='cart')

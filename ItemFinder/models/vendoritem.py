@@ -1,4 +1,6 @@
 from django.db import models
+from .vendor import Vendor
+from .spareitem import SpareItem
 
 class VendorItem(models.Model):
     """
@@ -9,5 +11,5 @@ class VendorItem(models.Model):
 
 
     price = models.DecimalField(max_digits=7, decimal_places=2)
-    vendor = models.ForeignKey("Vendor", on_delete=models.CASCADE, related_name='cart')
-    spareItem = models.ForeignKey("SpareItem", on_delete=models.CASCADE, related_name='cart')
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
+    spareItem = models.ForeignKey(SpareItem, on_delete=models.CASCADE)

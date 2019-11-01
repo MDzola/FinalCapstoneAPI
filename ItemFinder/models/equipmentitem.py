@@ -9,5 +9,5 @@ class EquipementItem(models.Model):
     methods: none
     """
 
-    equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE, related_name='cart')
-    spareItem = models.ForeignKey(SpareItem, on_delete=models.CASCADE, related_name='cart')
+    equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)
+    spareItem = models.ForeignKey(SpareItem, on_delete=models.CASCADE)

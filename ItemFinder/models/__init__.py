@@ -2,8 +2,8 @@ from .employee import Employee
 from .equipment import Equipment
 from .equipmentitem import EquipementItem
 from .itemcategory import ItemCategory
-from .requisition import Requisition
 from .requisitionitem import RequisitionItem
+from .requisitionorder import RequisitionOrder
 from .spareitem import SpareItem
 from .vendor import Vendor
 from .vendoritem import VendorItem
