@@ -57,16 +57,12 @@ class Employees(ViewSet):
             return HttpResponseServerError(ex)
 
     def list(self, request):
-        """Handle GET requests to park attractions resource
 
-        Returns:
-            Response -- JSON serialized list of park attractions
-        """
         employees = Employee.objects.all()
 
         user_id = self.request.query_params.get('employee', None)
         if user_id is not None:
-            employees = employee.filter(user__id=user_id)
+            employees = employees.filter(user__id=user_id)
 
         serializer = EmployeeSerializer(
             employees, many=True, context={'request': request})

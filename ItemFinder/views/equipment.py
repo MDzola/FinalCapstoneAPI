@@ -19,7 +19,7 @@ class EquipmentSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'url', 'name', 'manufacturer', 'manufacturer_contact')
 
 
-class Equipment(ViewSet):
+class Equipments(ViewSet):
 
     def create(self, request):
         """Handle POST operations

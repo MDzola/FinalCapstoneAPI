@@ -1,14 +1,13 @@
 from django.db import models
 from .employee import Employee
 from .spareitem import SpareItem
-from .requisitionitem import RequisitionItem
 
 class RequisitionOrder(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     isComplete = models.BooleanField(default=False)
-    spare_item = models.ManyToManyField(SpareItem, through=RequisitionItem)
+    spare_item = models.ManyToManyField(SpareItem, through="RequisitionItem")
 
 
 

@@ -10,7 +10,7 @@ from .spareitem import SpareItemSerializer
 
 
 class RequisitionOrderSerializer(serializers.HyperlinkedModelSerializer):
-    """JSON serializer for Orders
+    """JSON serializer for Requisitions
 
     Arguments:
         serializers
@@ -21,27 +21,23 @@ class RequisitionOrderSerializer(serializers.HyperlinkedModelSerializer):
             view_name='requisitionorder',
             lookup_field='id'
         )
-        fields = ('id', 'url', 'employee', 'spareitem')
+        fields = ('id', 'url', 'employee', 'isComplete', 'spare_item')
         depth = 1
 
 class RequisitionOrders(ViewSet):
-    """Orders for Bangazon API"""
+
 
     def create(self, request):
-        """Handle POST operations
 
-        Returns:
-            Response -- JSON serialized Order instance
-        """
         spare_item = RequisitionItem()
         spare_item.spareItem = SpareItem.objects.get(pk=request.data["id"])
 
         employee = Employee.objects.get(user=request.auth.user)
-        requisitionOrder = RequisitionOrder.objects.filter(employee=employee, isComplete__isFalse=True)
+        requisitionOrder = RequisitionOrder.objects.filter(employee=employee, isComplete=False)
 
         if requisitionOrder.exists():
             print("open order in db. Add it and the prod to OrderProduct")
-            spare_item.requisition = requisition[0]
+            spare_item.requisitionOrder= requisitionOrder[0]
         else:
             print("no open orders. Time to make a new order to add this product to")
             new_requisition_order = RequisitionOrder()
@@ -56,11 +52,7 @@ class RequisitionOrders(ViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        """Handle GET requests for single order
 
-        Returns:
-            Response -- JSON serialized order instance
-        """
         try:
             requisition = RequisitionOrder.objects.get(pk=pk)
             serializer = RequisitionOrderSerializer(requisition, context={'request': request})
@@ -69,11 +61,7 @@ class RequisitionOrders(ViewSet):
             return HttpResponseServerError(ex)
 
     def update(self, request, pk=None):
-        """Handle PUT requests for an Order
 
-        Returns:
-            Response -- Empty body with 204 status code
-        """
         requisition = RequisitionOrder.objects.get(pk=pk)
         isComplete = True
         requisition.isComplete = isComplete
@@ -82,11 +70,7 @@ class RequisitionOrders(ViewSet):
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, pk=None):
-        """Handle DELETE requests for a single order are
 
-        Returns:
-            Response -- 200, 404, or 500 status code
-        """
         try:
             requisition = RequisitionOrder.objects.get(pk=pk)
             requisition.delete()
@@ -101,11 +85,7 @@ class RequisitionOrders(ViewSet):
 
     @action(methods=['get'], detail=False)
     def cart(self, request):
-        """Handle GET one cart from logged in user
 
-        Returns:
-            Response -- JSON serialized list of products and order
-        """
         employee = Employee.objects.get(user=request.auth.user)
 
         if request.method == "GET":
@@ -113,7 +93,7 @@ class RequisitionOrders(ViewSet):
 
 
             try:
-                open_requisition_order = RequisitionOrder.objects.get(employee=employee, isComplete="False")
+                open_requisition_order = RequisitionOrder.objects.get(employee=employee, isComplete=False)
                 items_on_requisition = SpareItem.objects.filter(cart__order=open_requisition_order)
             except RequisitionOrder.DoesNotExist as ex:
                 return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
@@ -123,20 +103,15 @@ class RequisitionOrders(ViewSet):
 
 
     def list(self, request):
-        """Handle GET requests to orders resource
 
-        Returns:
-            Response -- JSON serialized list of orders
-        """
         requisitions = RequisitionOrder.objects.all()
-        employee = Employee.objects.get(pk=request.auth.user.id)
-        # (pk=request.auth.user)
+        employee = Employee.objects.get(user=request.auth.user)
 
         cart = self.request.query_params.get('cart', None)
-        requisitions = requisitions.filter(employee=employee, isComplete="False")
+        requisitions = requisitions.filter(employee=employee, isComplete=False)
         print("requisitions", requisitions)
         if cart is not None:
-            requisitions = requisitions.filter(isComplete="False").get()
+            requisitions = requisitions.filter(isComplete=False).get()
             print("requisitions filtered", requisitions)
             serializer = RequisitionOrderSerializer(
                 requisitions, many=False, context={'request': request}

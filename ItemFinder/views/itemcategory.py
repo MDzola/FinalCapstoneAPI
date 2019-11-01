@@ -27,7 +27,7 @@ class ItemCategories(ViewSet):
             Response -- JSON serialized product category instance
         """
         new_item_category = ItemCategory()
-        new_item_category.name = request.data["name"]
+        new_item_category.name = request.data["category_name"]
         new_item_category.save()
 
         serializer = ItemCategorySerializer(new_item_category, context={'request': request})
