@@ -98,10 +98,13 @@ class SpareItems(ViewSet):
         spare_items = SpareItem.objects.all()
         spare_items_list = []
 
-        # Support filtering spare-items by category id
-        category = self.request.query_params.get('category', None)
-        if category is not None:
-            spare_items = spare_items.filter(category__id=category)
+
+        name = self.request.query_params.get('name', None)
+
+        if name == "":
+            spare_items = SpareItem.object.all()
+        elif name is not None:
+            spare_items = SpareItem.objects.filter(name=name.lower())
 
         serializer = SpareItemSerializer(
             spare_items, many=True, context={'request': request})
