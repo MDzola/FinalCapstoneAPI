@@ -17,3 +17,6 @@ class SpareItem(models.Model):
         verbose_name = ("Item")
         verbose_name_plural = ("Items")
 
+    def new_inventory(self, num):
+        inv = self.quantity - num
+        return inv

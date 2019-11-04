@@ -89,22 +89,30 @@ class SpareItems(ViewSet):
         except Exception as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def list(self, request):
-        """Handle GET requests to park attractions resource
 
-        Returns:
-            Response -- JSON serialized list of park attractions
-        """
+    def list(self, request):
+
         spare_items = SpareItem.objects.all()
         spare_items_list = []
 
-        # Support filtering spare-items by category id
+
+        name = self.request.query_params.get('name', None)
         category = self.request.query_params.get('category', None)
+        all_items = self.request.query_params.get('all', "None")
+
+        if all_items == "None":
+            all_spare_parts = SpareItem.objects.all()
+
         if category is not None:
-            spare_items = spare_items.filter(category__id=category)
+            all_spare_parts = SpareItem.objects.filter(category__id=category)
+
+        if name == "":
+            spare_items = SpareItem.object.all()
+        elif name is not None:
+            spare_items = SpareItem.objects.filter(name=name.lower())
 
         serializer = SpareItemSerializer(
-            spare_items, many=True, context={'request': request})
+            all_spare_parts, many=True, context={'request': request})
         return Response(serializer.data)
 
 
