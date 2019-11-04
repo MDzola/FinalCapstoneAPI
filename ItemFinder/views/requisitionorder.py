@@ -42,8 +42,8 @@ class RequisitionOrders(ViewSet):
             print("no open orders. Time to make a new order to add this product to")
             new_requisition_order = RequisitionOrder()
             new_requisition_order.employee = employee
-            spare_item.order = new_requisition_order
             new_requisition_order.save()
+            spare_item.order = new_requisition_order
 
         spare_item.save()
 
